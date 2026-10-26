@@ -279,6 +279,7 @@ else:
 st.markdown("---")
 
 # --- 5. 4-NODE MULTI-AGENT EXECUTION ---
+# --- 5. 4-NODE MULTI-AGENT EXECUTION ---
 if run_button:
     with st.status("Running 4-Node Autonomous Due Diligence Pipeline...", expanded=True) as status:
         if uploaded_pdf:
@@ -306,6 +307,7 @@ if run_button:
             user_task=f"QUANT SNAPSHOT:\n{quant_context}\n\nHIGH-SIGNAL PDF PAGES:\n{pdf_text[:14000]}",
             primary_model="llama-3.1-8b-instant"
         )
+        time.sleep(3)  # Pause to respect Groq free tier rate limits
 
         st.write("🔍 Node 2 (Forensic Risk Detective): Auditing contingent liabilities, margin headwinds, and governance...")
         risk_report = ask_ai_agent(
@@ -313,6 +315,7 @@ if run_button:
             user_task=f"QUANT SNAPSHOT:\n{quant_context}\n\nHIGH-SIGNAL PDF PAGES:\n{pdf_text[:14000]}",
             primary_model="llama-3.1-8b-instant"
         )
+        time.sleep(3)  # Pause to respect Groq free tier rate limits
 
         st.write("🌐 Node 3 (Market Intelligence Scout): Fetching live news catalysts & competitor actions...")
         market_news = ""
@@ -355,6 +358,30 @@ if run_button:
             primary_model="llama-3.3-70b-versatile"
         )
         status.update(label="Multi-Agent Due Diligence Complete!", state="complete", expanded=False)
+
+    # --- 6. RENDER OUTPUT TABS & DOWNLOAD BUTTON ---
+    if not final_memo.startswith("⚠️"):
+        st.download_button(
+            label="📥 Download Investment Committee Memo (.md)",
+            data=final_memo,
+            file_name=f"{ticker_input.replace('.','_')}_IC_Due_Diligence_Memo.md",
+            mime="text/markdown"
+        )
+
+    tab1, tab2, tab3, tab4 = st.tabs([
+        "📋 Final IC Memorandum",
+        "🧮 Node 1: Quant & Filing Audit",
+        "⚠️ Node 2: Forensic Risk Audit",
+        "🌐 Node 3: Live Market Signals"
+    ])
+    with tab1:
+        st.markdown(final_memo)
+    with tab2:
+        st.markdown(fin_report)
+    with tab3:
+        st.markdown(risk_report)
+    with tab4:
+        st.markdown(market_news)
 
     # --- 6. RENDER OUTPUT TABS & DOWNLOAD BUTTON ---
     st.download_button(
